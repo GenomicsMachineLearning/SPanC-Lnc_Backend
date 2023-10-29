@@ -1,6 +1,6 @@
-pip install Django==2.2.19
-pip install djangorestframework==3.8.2
+pip install Django=2.2.19
+pip install djangorestframework=3.8.2
 pip install anndata
 pip install scanpy
-pip install djangorestframework-camel-case==0.2.0
-pip install django-filter==2.0.0
+pip install djangorestframework-camel-case=0.2.0
+pip install django-filter=2.0.0
