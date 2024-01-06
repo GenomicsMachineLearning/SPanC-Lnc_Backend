@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'geneExplorer',
+    'dj_database_url'
 ]
 
 MIDDLEWARE = [
@@ -81,14 +83,18 @@ WSGI_APPLICATION = 'Incrna.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'prakrithi$incrna',
+        'USER': 'prakrithi',
+        'PASSWORD': 'rithu18@pa',
+        'HOST': 'prakrithi.mysql.pythonanywhere-services.com',
     }
 }
 
 import dj_database_url
 
-DATABASES['default'] = dj_database_url.parse('mysql://root@localhost/incrna')
+# DATABASES['default'] = dj_database_url.parse('mysql://root@localhost/incrna')
+DATABASES['default'] = dj_database_url.parse('mysql://prakrithi:rithu18@pa@prakrithi.mysql.pythonanywhere-services.com/prakrithi$incrna')
 
 
 # Password validation
@@ -125,7 +131,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'asserts'),
+]
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'asserts')
+# MEDIA_URL = '/asserts/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
