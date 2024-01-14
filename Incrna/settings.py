@@ -92,9 +92,10 @@ DATABASES = {
 }
 
 import dj_database_url
-
-# DATABASES['default'] = dj_database_url.parse('mysql://root@localhost/incrna')
-DATABASES['default'] = dj_database_url.parse('mysql://prakrithi:rithu18@pa@prakrithi.mysql.pythonanywhere-services.com/prakrithi$incrna')
+# For Local Database connection
+DATABASES['default'] = dj_database_url.parse('mysql://root@localhost/db_lncrna') 
+# For pythonanywhere database connection.
+# DATABASES['default'] = dj_database_url.parse('mysql://prakrithi:rithu18@pa@prakrithi.mysql.pythonanywhere-services.com/prakrithi$incrna')
 
 
 # Password validation

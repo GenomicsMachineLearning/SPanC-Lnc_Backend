@@ -51,8 +51,8 @@ class GenesListView(ListAPIView):
     queryset = Genes.objects.all()
     serializer_class = GenesListSerializer
     filter_backends = [filters.SearchFilter]
-    search_fields = ('geneid','chromosome','start','end','gl_id','strand','samples','cell_types','overlapping','overlapping_regulatory_element','overlapping_snp','coservation_score','mfe_score','prognostic','id')
-    ordering_fields = ('geneid','chromosome','start','end','gl_id','strand','samples','cell_types','overlapping','overlapping_regulatory_element','overlapping_snp','coservation_score','mfe_score','prognostic','id')
+    search_fields = ('ID','CUTAR_ID','CHROMOSOME','START','END','TRANSCRIPT','STRAND','SAMPLES_DETECTED','CANCER_TYPES_DETECTED','CELL_TYPE_SPECIFICITY','CELL_TYPE_SPECIFICITY_IN_CANCER_TYPE','DETECTION_IN_OTHER_DATABASES','ID_IN_OTHER_DATABASES','NONCODEID','DISEASE','GENE','CLASSIFICATION','OVERLAPPING_PROMOTER','OVERLAPPING_ENHANCER','ENHANCER_ASSOCIATED','OVERLAPPING_SNPS','CODING_POTENTIAL','COSERVATION_SCORE','OVERLAPPING_ORF','MFE_SCORE','PROGNOSTIC_VALUE','VALIDATION')
+    ordering_fields = ('ID','CUTAR_ID','CHROMOSOME','START','END','TRANSCRIPT','STRAND','SAMPLES_DETECTED','CANCER_TYPES_DETECTED','CELL_TYPE_SPECIFICITY','CELL_TYPE_SPECIFICITY_IN_CANCER_TYPE','DETECTION_IN_OTHER_DATABASES','ID_IN_OTHER_DATABASES','NONCODEID','DISEASE','GENE','CLASSIFICATION','OVERLAPPING_PROMOTER','OVERLAPPING_ENHANCER','ENHANCER_ASSOCIATED','OVERLAPPING_SNPS','CODING_POTENTIAL','COSERVATION_SCORE','OVERLAPPING_ORF','MFE_SCORE','PROGNOSTIC_VALUE','VALIDATION')
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -61,7 +61,7 @@ class GenesListView(ListAPIView):
         ordering_param = self.request.query_params.get('ordering', None)
 
         # Default ordering if no parameter is provided
-        default_ordering = 'id'
+        default_ordering = 'CUTAR_ID'
 
         # Define the fields that are allowed for ordering
         allowed_ordering_fields = self.ordering_fields
@@ -77,11 +77,11 @@ class GenesListView(ListAPIView):
 class GeneIDsListsView(ListAPIView):
     authentication_classes = ()
     permission_classes = ()
-    queryset = Genes.objects.distinct().filter(is_contains_sample = True).values('id','is_contains_sample')
+    queryset = Genes.objects.all()
     serializer_class = GenesListSerializerId
     filter_backends = [filters.SearchFilter]
-    search_fields = ('id', 'geneid', 'is_contains_sample')
-    ordering_fields = ('id')
+    search_fields = ['CUTAR_ID']
+    ordering_fields = ['CUTAR_ID']
 
     def get_queryset(self):
         # return Genes.objects.all()
@@ -125,11 +125,11 @@ def geneExplorerViewApi(request):
             data = json.loads(request.body)
             geneId = data.get('geneId', None)
             matplotlib.use('Agg')
-            h5ad_files = [{"filePath":os.path.join(settings.BASE_DIR, 'asserts', 'HNC.h5ad'),"name":'Head and Neck Cancer'},
-                          {"filePath":os.path.join(settings.BASE_DIR, 'asserts', 'Melanoma.h5ad'),"name":'Melanoma'},
-                          {"filePath":os.path.join(settings.BASE_DIR, 'asserts', 'SCC.h5ad'),"name":'SCC'},
-                          {"filePath":os.path.join(settings.BASE_DIR, 'asserts', 'BCC.h5ad'),"name":'BCC'},
-                          {"filePath":os.path.join(settings.BASE_DIR, 'asserts', 'KidneyCancer.h5ad'),"name":'Kidney Cancer'}]
+            h5ad_files = [{"filePath":os.path.join(settings.BASE_DIR, 'asserts', 'HNC.h5ad'),"name":'Head and Neck Cancer',"size":1.5},
+                          {"filePath":os.path.join(settings.BASE_DIR, 'asserts', 'Melanoma.h5ad'),"name":'Melanoma',"size":0.8},
+                          {"filePath":os.path.join(settings.BASE_DIR, 'asserts', 'SCC.h5ad'),"name":'SCC',"size":0.23},
+                          {"filePath":os.path.join(settings.BASE_DIR, 'asserts', 'BCC.h5ad'),"name":'BCC', "size":0.25},
+                          {"filePath":os.path.join(settings.BASE_DIR, 'asserts', 'KidneyCancer.h5ad'),"name":'Kidney Cancer', "size":0.7}]
             # h5ad_file_path = os.path.join(settings.BASE_DIR, 'asserts', 'HNC.h5ad')
             # h5ad_files = [{"filePath":h5ad_file_path,"name":'Head and Neck Cancer'}]
 
@@ -138,7 +138,7 @@ def geneExplorerViewApi(request):
             for h5ad_file in h5ad_files:
                 HNC = anndata.read_h5ad(h5ad_file["filePath"])  # Accessing 'filePath' correctly here
                 if geneId in HNC.var_names:
-                    sc.pl.spatial(HNC, alpha_img=0.5, color=[geneId], show=False,  cmap='inferno',size=2)
+                    sc.pl.spatial(HNC, alpha_img=0.5, color=[geneId], show=False,  cmap='inferno',size=h5ad_file['size'])
                     fig = plt.gcf()
                     buffer = io.BytesIO()
                     fig.savefig(buffer, format='png', bbox_inches='tight')
