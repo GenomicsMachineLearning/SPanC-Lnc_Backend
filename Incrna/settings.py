@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'Incrna.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'prakrithi$incrna',
+        'NAME': 'prakrithi$db_lncrna',
         'USER': 'prakrithi',
         'PASSWORD': 'rithu18@pa',
         'HOST': 'prakrithi.mysql.pythonanywhere-services.com',
@@ -93,9 +93,9 @@ DATABASES = {
 
 import dj_database_url
 # For Local Database connection
-DATABASES['default'] = dj_database_url.parse('mysql://root@localhost/db_lncrna') 
+DATABASES['default'] = dj_database_url.parse('mysql://root@127.0.0.1/db_lncrna')
 # For pythonanywhere database connection.
-# DATABASES['default'] = dj_database_url.parse('mysql://prakrithi:rithu18@pa@prakrithi.mysql.pythonanywhere-services.com/prakrithi$incrna')
+# DATABASES['default'] = dj_database_url.parse('mysql://prakrithi:rithu18@pa@prakrithi.mysql.pythonanywhere-services.com/prakrithi$db_lncrna')
 
 
 # Password validation

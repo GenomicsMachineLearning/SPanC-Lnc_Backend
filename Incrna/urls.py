@@ -38,7 +38,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from geneExplorer.views import (
-GenesListView,GeneIDsListsView ,geneExplorerViewApi
+GenesListView,GeneIDsListsView ,geneExplorerViewApi, geneExplorerViewScrApi, geneExplorerViewSlrApi
 )
 
 urlpatterns = [
@@ -47,6 +47,8 @@ urlpatterns = [
     path('genes_list', GenesListView.as_view(), name = "GenesListView"),
     path('genesid', GeneIDsListsView.as_view(), name = "GeneIDsListsView"),
     path('genes', geneExplorerViewApi, name='geneExplorerViewApi'),
+    path('genesSlr', geneExplorerViewSlrApi, name='geneExplorerViewSlrApi'),
+    path('genesScr', geneExplorerViewScrApi, name='geneExplorerViewScrApi'),
 
 ]
 
