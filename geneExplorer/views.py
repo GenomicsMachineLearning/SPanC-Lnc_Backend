@@ -17,7 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 # def geneExplorer(request):
 #     matplotlib.use('Agg')  # Use non-GUI backend
 #     # if request.meathod == 'GET':
-#     HNC = anndata.read_h5ad("asserts/HNC.h5ad")
+#     HNC = anndata.read_h5ad("assets/HNC.h5ad")
 #     #    fig = sc.pl.spatial(HNC, alpha_img=0.5,color = ['cuTAR213507'])   # Create a blank figure
 #     #    sc.pl.spatial(HNC, alpha_img=0.5,color = ['cuTAR213507']) # user query in place of cuTAR213507
 #     # Convert the plot to a base64 encoded string
@@ -89,7 +89,7 @@ class GeneIDsListsView(ListAPIView):
 #             data = json.loads(request.body)
 #             geneId = data.get('geneId', None)
 #             matplotlib.use('Agg')  # Use non-GUI backend
-#             HNC = anndata.read_h5ad("asserts/HNC.h5ad")
+#             HNC = anndata.read_h5ad("assets/HNC.h5ad")
 #              #fig = sc.pl.spatial(HNC, alpha_img=0.5,color = ['cuTAR213507'])   # Create a blank figure
 #              # sc.pl.spatial(HNC, alpha_img=0.5,color = ['cuTAR213507']) # user query in place of cuTAR213507
 #              # Convert the plot to a base64 encoded string
@@ -120,10 +120,10 @@ def geneExplorerViewApi(request):
             geneId = data.get('geneId', None)
             matplotlib.use('Agg')
         
-            h5ad_files = [{"filePath":"asserts/HNC.h5ad","name":'Head and Neck Cancer'}, 
-                          {"filePath":"asserts/Melanoma.h5ad","name":'Melanoma'},
-                          {"filePath":"asserts/SCC.h5ad","name":'SCC'},
-                          {"filePath":"asserts/BCC.h5ad","name":'BCC'}]
+            h5ad_files = [{"filePath":"assets/HNC.h5ad","name":'Head and Neck Cancer'},
+                          {"filePath":"assets/Melanoma.h5ad","name":'Melanoma'},
+                          {"filePath":"assets/SCC.h5ad","name":'SCC'},
+                          {"filePath":"assets/BCC.h5ad","name":'BCC'}]
 
             plots = []
 
