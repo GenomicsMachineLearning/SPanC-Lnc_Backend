@@ -11,6 +11,7 @@ djangorestframework==3.15.1
 djangorestframework-camel-case==1.4.2
 exceptiongroup==1.2.1
 fonttools==4.53.0
+gunicorn==22.0.0
 h5py==3.11.0
 joblib==1.4.2
 kiwisolver==1.4.5
@@ -43,3 +44,4 @@ tqdm==4.66.4
 typing_extensions==4.12.1
 tzdata==2024.1
 umap-learn==0.5.6
+whitenoise==6.6.0
