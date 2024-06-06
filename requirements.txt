@@ -1,8 +1,11 @@
 anndata==0.10.7
 array_api_compat==1.7.1
+asgiref==3.8.1
 contourpy==1.2.1
 cycler==0.12.1
-Django==2.2.19
+dj-database-url==2.2.0
+Django==5.0.6
+django-cors-headers==4.3.1
 django-filter==2.0.0
 djangorestframework==3.8.2
 djangorestframework-camel-case==0.2.0
@@ -37,5 +40,6 @@ statsmodels==0.14.2
 stdlib-list==0.10.0
 threadpoolctl==3.5.0
 tqdm==4.66.4
+typing_extensions==4.12.1
 tzdata==2024.1
 umap-learn==0.5.6
