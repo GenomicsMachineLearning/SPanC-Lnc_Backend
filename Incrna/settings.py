@@ -86,9 +86,9 @@ DATABASES = {
     }
 }
 
-import dj_database_url
-
-DATABASES['default'] = dj_database_url.parse('mysql://root@localhost/incrna')
+# import dj_database_url
+#
+# DATABASES['default'] = dj_database_url.parse('mysql://root@localhost/incrna')
 
 
 # Password validation
