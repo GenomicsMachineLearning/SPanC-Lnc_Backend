@@ -22,11 +22,17 @@ class GenesListView(ListAPIView):
     serializer_class = GenesListSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = (
-        'id', 'cutar_id', 'chromosome', 'start', 'end', 'transcript', 'strand', 'samples', 'cell_types', 'overlapping',
-        'overlapping_regulatory_element', 'overlapping_snp', 'conservation_score')
+        'id', 'cutar_id', 'chromosome', 'start', 'end', 'transcript', 'strand', 'samples_detected',
+        'cancer_types_detected', 'cell_type_specificity', 'cell_type_specificity_in_cancer_type',
+        'detection_in_other_databases', 'id_in_other_databases', 'noncodeid', 'disease', 'gene', 'validation',
+        'classification', 'overlapping_promoter', 'overlapping_enhancer', 'enhancer_associated', 'overlapping_snps',
+        'overlapping_orf')
     ordering_fields = (
-        'id', 'cutar_id', 'chromosome', 'start', 'end', 'transcript', 'strand', 'samples', 'cell_types', 'overlapping',
-        'overlapping_regulatory_element', 'overlapping_snp', 'conservation_score')
+        'id', 'cutar_id', 'chromosome', 'start', 'end', 'transcript', 'strand', 'samples_detected',
+        'cancer_types_detected', 'cell_type_specificity', 'cell_type_specificity_in_cancer_type',
+        'detection_in_other_databases', 'id_in_other_databases', 'noncodeid', 'disease', 'gene', 'validation',
+        'classification', 'overlapping_promoter', 'overlapping_enhancer', 'enhancer_associated', 'overlapping_snps',
+        'overlapping_orf')
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -91,7 +97,7 @@ class GeneExplorerView():
         if request.method == 'POST':
             try:
                 data = json.loads(request.body)
-                geneId = data.get('cutar_id', None)
+                geneId = data.get('cutarId', None)
                 matplotlib.use('Agg')
 
                 h5ad_files = [{"filePath": "assets/HNC.h5ad", "name": 'Head and Neck Cancer'},

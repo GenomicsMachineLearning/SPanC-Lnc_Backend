@@ -38,10 +38,12 @@ from django.urls import path
 import geneExplorer.views as views
 
 urlpatterns = [
-    path('admin/',admin.site.urls),
+    # path('admin/',admin.site.urls),
     # path('genes', geneExplorer, name = "ganes"),
     path('genes_list', views.GenesListView.as_view(), name = "GenesListView"),
     path('genesid', views.GeneIDsListsView.as_view(), name = "GeneIDsListsView"),
-    path('genes', views.GeneExplorerView.geneExplorerViewApi, name='geneExplorerViewApi'),
+    path('genes', views.GeneExplorerView.geneExplorerViewApi, name='GeneExplorerView'),
+    path('genesSlr', views.GeneExplorerView.geneExplorerViewApi, name='GeneExplorerView'),
+    path('genesScr', views.GeneExplorerView.geneExplorerViewApi, name='GeneExplorerView'),
 
 ]
