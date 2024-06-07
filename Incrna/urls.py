@@ -35,15 +35,13 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from geneExplorer.views import (
-GenesListView,GeneIDsListsView ,geneExplorerViewApi                     
-)
+import geneExplorer.views as views
 
 urlpatterns = [
     path('admin/',admin.site.urls),
     # path('genes', geneExplorer, name = "ganes"),
-    path('genes_list', GenesListView.as_view(), name = "GenesListView"),
-    path('genesid', GeneIDsListsView.as_view(), name = "GeneIDsListsView"),
-    path('genes', geneExplorerViewApi, name='geneExplorerViewApi'),
+    path('genes_list', views.GenesListView.as_view(), name = "GenesListView"),
+    path('genesid', views.GeneIDsListsView.as_view(), name = "GeneIDsListsView"),
+    path('genes', views.GeneExplorerView.geneExplorerViewApi, name='geneExplorerViewApi'),
 
 ]

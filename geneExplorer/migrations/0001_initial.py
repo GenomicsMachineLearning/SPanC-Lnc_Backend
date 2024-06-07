@@ -15,7 +15,8 @@ class Migration(migrations.Migration):
             name='Genes',
             fields=[
                 ('ID', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('CUTAR_ID', models.IntegerField(blank=True, null=True)),
+                ('CUTAR_ID',  models.CharField(blank=True, max_length=128, null=True)),
+                ('CHROMOSOME',  models.CharField(blank=True, max_length=128, null=True)),
                 ('START', models.IntegerField(blank=True, null=True)),
                 ('END', models.IntegerField(blank=True, null=True)),
                 ('TRANSCRIPT', models.CharField(blank=True, max_length=128, null=True)),

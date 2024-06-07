@@ -20,8 +20,8 @@ with zipfile.ZipFile('assets/annotation_table.zip') as zip_file:
                            '?, ?, ?, ?, ?, ' +
                            '?, ?, ?, ?, ?,' +
                            '?, ?, ?, ?, ?,' +
-                           '?, ?)',
-                           [row_dict[col] for col in header[:22]])
+                           '?, ?, ?)',
+                           [row_dict[col] for col in header[:23]])
 
 # Commit the changes and close the connection
 conn.commit()
