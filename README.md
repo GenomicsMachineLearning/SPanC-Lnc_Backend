@@ -27,6 +27,7 @@ Install dependencies:
 
 * Running locally
   * ```docker build -t myapp-local -f Dockerfile-local .```
+  * ```docker run -p 8000:8000 myapp-local```
 
 See:
 * Dockerfile - for deploying/testing in AWS Lambda,

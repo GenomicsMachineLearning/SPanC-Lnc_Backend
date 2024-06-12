@@ -32,4 +32,4 @@ RUN python manage.py migrate --noinput
 RUN python scripts/import_csv.py
 
 EXPOSE 8000
-CMD ["gunicorn", "polls.wsgi:application", "-w=1", "-b=0.0.0.0:8000"]
+CMD ["gunicorn", "Incrna.wsgi:application", "-w=1", "-b=0.0.0.0:8000"]
