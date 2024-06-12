@@ -8,6 +8,7 @@ import json as json
 import base64 as base64
 import django.views.decorators.csrf as django_views_csrf
 import geneExplorer.views as ge_views
+from Incrna import settings
 
 
 class GeneSpatialLongReadView():
@@ -21,12 +22,12 @@ class GeneSpatialLongReadView():
                 matplotlib.use('Agg')
 
                 h5ad_files = [
-                    {"filePath": "data/HNC_ilong_nano.h5ad", "name": 'Head and Neck Cancer - Nanopore', "size": 0.8},
-                    {"filePath": "data/SCC_nano.h5ad", "name": 'SCC - Nanopore', "size": 0.2},
-                    {"filePath": "data/BCC_nano.h5ad", "name": 'BCC - Nanopore', "size": 0.2},
-                    {"filePath": "data/CP_pacbio.h5ad", "name": 'Colorectal Cancer (Primary Tumor) - PacBio',
+                    {"filePath": f"{settings.DATA_DIR}/HNC_ilong_nano.h5ad", "name": 'Head and Neck Cancer - Nanopore', "size": 0.8},
+                    {"filePath": f"{settings.DATA_DIR}/SCC_nano.h5ad", "name": 'SCC - Nanopore', "size": 0.2},
+                    {"filePath": f"{settings.DATA_DIR}/BCC_nano.h5ad", "name": 'BCC - Nanopore', "size": 0.2},
+                    {"filePath": f"{settings.DATA_DIR}/CP_pacbio.h5ad", "name": 'Colorectal Cancer (Primary Tumor) - PacBio',
                      "size": 0.7},
-                    {"filePath": "data/CM_pacbio.h5ad", "name": 'Colorectal Cancer (Metastasized Tumor) - PacBio',
+                    {"filePath": f"{settings.DATA_DIR}/CM_pacbio.h5ad", "name": 'Colorectal Cancer (Metastasized Tumor) - PacBio',
                      "size": 0.8}]
 
                 plots = []

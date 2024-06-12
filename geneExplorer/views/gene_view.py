@@ -8,6 +8,7 @@ import json as json
 import base64 as base64
 import django.views.decorators.csrf as django_views_csrf
 import geneExplorer.views as ge_views
+from Incrna import settings
 
 
 class GeneView():
@@ -20,11 +21,11 @@ class GeneView():
                 geneId = data.get('cutarId', None)
                 matplotlib.use('Agg')
 
-                h5ad_files = [{"filePath": "data/HNC.h5ad", "name": 'Head and Neck Cancer', "size": 1.1},
-                              {"filePath": "data/Melanoma.h5ad", "name": 'Melanoma', "size": 0.8},
-                              {"filePath": "data/SCC.h5ad", "name": 'SCC', "size": 0.2},
-                              {"filePath": "data/BCC.h5ad", "name": 'BCC', "size": 0.2},
-                              {"filePath": "data/KidneyCancer.h5ad", "name": 'Kidney Cancer', "size": 0.5}]
+                h5ad_files = [{"filePath": f"{settings.DATA_DIR}/HNC.h5ad", "name": 'Head and Neck Cancer', "size": 1.1},
+                              {"filePath": f"{settings.DATA_DIR}/Melanoma.h5ad", "name": 'Melanoma', "size": 0.8},
+                              {"filePath": f"{settings.DATA_DIR}/SCC.h5ad", "name": 'SCC', "size": 0.2},
+                              {"filePath": f"{settings.DATA_DIR}/BCC.h5ad", "name": 'BCC', "size": 0.2},
+                              {"filePath": f"{settings.DATA_DIR}/KidneyCancer.h5ad", "name": 'Kidney Cancer', "size": 0.5}]
 
                 plots = []
 

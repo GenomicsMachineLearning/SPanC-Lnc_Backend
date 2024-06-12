@@ -8,6 +8,7 @@ import json as json
 import base64 as base64
 import django.views.decorators.csrf as django_views_csrf
 import geneExplorer.views as ge_views
+from Incrna import settings
 
 
 class SingleCellView():
@@ -19,7 +20,7 @@ class SingleCellView():
                 data = json.loads(request.body)
                 geneId = data.get('cutarId', None)
                 matplotlib.use('Agg')
-                h5ad_files = [{"filePath": "data/Melanoma_scRNA.h5ad", "name": 'Melanoma'}]
+                h5ad_files = [{"filePath": f"{settings.DATA_DIR}/Melanoma_scRNA.h5ad", "name": 'Melanoma'}]
                 plots = []
                 for h5ad_file in h5ad_files:
                     HNC = anndata.read_h5ad(h5ad_file["filePath"])  # Accessing 'filePath' correctly here
