@@ -21,12 +21,12 @@ class GeneSpatialLongReadView():
                 matplotlib.use('Agg')
 
                 h5ad_files = [
-                    {"filePath": "assets/HNC_ilong_nano.h5ad", "name": 'Head and Neck Cancer - Nanopore', "size": 0.8},
-                    {"filePath": "assets/SCC_nano.h5ad", "name": 'SCC - Nanopore', "size": 0.2},
-                    {"filePath": "assets/BCC_nano.h5ad", "name": 'BCC - Nanopore', "size": 0.2},
-                    {"filePath": "assets/CP_pacbio.h5ad", "name": 'Colorectal Cancer (Primary Tumor) - PacBio',
+                    {"filePath": "data/HNC_ilong_nano.h5ad", "name": 'Head and Neck Cancer - Nanopore', "size": 0.8},
+                    {"filePath": "data/SCC_nano.h5ad", "name": 'SCC - Nanopore', "size": 0.2},
+                    {"filePath": "data/BCC_nano.h5ad", "name": 'BCC - Nanopore', "size": 0.2},
+                    {"filePath": "data/CP_pacbio.h5ad", "name": 'Colorectal Cancer (Primary Tumor) - PacBio',
                      "size": 0.7},
-                    {"filePath": "assets/CM_pacbio.h5ad", "name": 'Colorectal Cancer (Metastasized Tumor) - PacBio',
+                    {"filePath": "data/CM_pacbio.h5ad", "name": 'Colorectal Cancer (Metastasized Tumor) - PacBio',
                      "size": 0.8}]
 
                 plots = []

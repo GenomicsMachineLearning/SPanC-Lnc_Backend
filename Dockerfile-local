@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy Django application
-COPY ./assets/*.h5ad ./assets/
+COPY ./data/*.h5ad ./data/
 COPY ./assets/annotation_table.zip ./assets/
 COPY geneExplorer/ ./geneExplorer
 COPY Incrna/ ./Incrna

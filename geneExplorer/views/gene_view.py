@@ -20,11 +20,11 @@ class GeneView():
                 geneId = data.get('cutarId', None)
                 matplotlib.use('Agg')
 
-                h5ad_files = [{"filePath": "assets/HNC.h5ad", "name": 'Head and Neck Cancer', "size": 1.1},
-                              {"filePath": "assets/Melanoma.h5ad", "name": 'Melanoma', "size": 0.8},
-                              {"filePath": "assets/SCC.h5ad", "name": 'SCC', "size": 0.2},
-                              {"filePath": "assets/BCC.h5ad", "name": 'BCC', "size": 0.2},
-                              {"filePath": "assets/KidneyCancer.h5ad", "name": 'Kidney Cancer', "size": 0.5}]
+                h5ad_files = [{"filePath": "data/HNC.h5ad", "name": 'Head and Neck Cancer', "size": 1.1},
+                              {"filePath": "data/Melanoma.h5ad", "name": 'Melanoma', "size": 0.8},
+                              {"filePath": "data/SCC.h5ad", "name": 'SCC', "size": 0.2},
+                              {"filePath": "data/BCC.h5ad", "name": 'BCC', "size": 0.2},
+                              {"filePath": "data/KidneyCancer.h5ad", "name": 'Kidney Cancer', "size": 0.5}]
 
                 plots = []
 

@@ -19,7 +19,8 @@ WORKDIR /var/task
 COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.8.3 /lambda-adapter /opt/extensions/lambda-adapter
 
 # Copy Django application
-COPY ./assets/*.h5ad ./assets/
+# Assume EFS will store assets here.
+# COPY ./assets/*.h5ad ./data/
 COPY ./assets/annotation_table.zip ./assets/
 COPY geneExplorer/ ./geneExplorer
 COPY Incrna/ ./Incrna
