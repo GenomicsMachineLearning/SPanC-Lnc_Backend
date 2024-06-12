@@ -3,6 +3,7 @@
 ## Running Locally
 
 ### In a Local Python Environment
+
 Setup a conda environment:
 * MacOS
   * ```conda create --name spanc-lnc --subdir osx-64 python=3.10 -y```
@@ -17,6 +18,9 @@ Install dependencies:
 ### Creating Database
 * ```python manage.py migrate```
 * ```python scripts/```
+
+### Running Directly
+* ```python manage.py runserver```
 
 ### Building and Running Docker Images
 

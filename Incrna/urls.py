@@ -4,6 +4,7 @@ import geneExplorer.views as views
 urlpatterns = [
     # path('admin/',admin.site.urls),
     # path('genes', geneExplorer, name = "ganes"),
+    dj_urls.path('', views.HomeView.as_view(), name="Ok"),
     dj_urls.path('genes_list', views.GenesListView.as_view(), name="GenesListView"),
     dj_urls.path('genesid', views.GeneIDsListsView.as_view(), name="GeneIDsListsView"),
     dj_urls.path('genes', views.GeneView.gene_view_api, name='GeneExplorerView'),
