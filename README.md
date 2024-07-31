@@ -21,7 +21,7 @@ We have two methods for running the backend server:
 * Run in a conda environment or
 * Docker.
 
-### In a Local Python Environment
+### Running the Server in a Local Python Environment
 
 The steps to run in a local conda environment include:
 * Setup a new Python environment and install dependencies.
@@ -41,33 +41,34 @@ We assume you already have conda installed.
 * Install Python dependencies:
   * ```python -m pip install -r requirements.txt```
 
-Setup a local database:
-* ```python manage.py migrate```
-* ```python scripts/import_csv.py```
+* Setup a local database:
+  * ```python manage.py migrate```
+  * ```python scripts/import_csv.py```
 
-### Running Directly
-* ```python manage.py runserver```
+* Run server:
+  * ```python manage.py runserver```
 
-### Building and Running Docker Images
+### Running the Server using Docker
 
-* Installing Docker
+* Install Docker
   * https://docs.docker.com/desktop/install/mac-install/
   * https://docs.docker.com/desktop/install/windows-install/
   * Add ```$HOME/.docker/bin``` to you PATH.
 
-Setup a local database:
-* ```python manage.py migrate```
-* ```python scripts/import_csv.py```
+* Setup a local database:
+  * ```python manage.py migrate```
+  * ```python scripts/import_csv.py```
 
-* Running locally:
+* Running server:
   * ```docker build -t myapp-local -f Dockerfile-local .```
   * ```docker run -p 8000:8000 myapp-local```
 
-See:
+## Other Information
+
 * Dockerfile - for deploying/testing in AWS Lambda,
 * Dockerfile-local - for testing the Dockerfile locally.
 
 Using:
-* https://hub.docker.com/_/python - 
+* Python in Docker https://hub.docker.com/_/python  
 * Debian https://www.debian.org/releases/
 
