@@ -1,8 +1,6 @@
 # SPanC-Lnc Backend
 
-We require data to be downloaded. The following need to be added to a directory relative to this project called "data".
-
-Files:
+We require data to be downloaded. The following need to be added to a directory relative to this project called "data":
 * [BCC_nano.h5ad](https://downloads.gmllab.com/SPanC-Lnc/BCC_nano.h5ad) - 40.8 MB
 * [BCC.h5ad](https://downloads.gmllab.com/SPanC-Lnc/BCC.h5ad) - 115.9 MB
 * [CM_pacbio.h5ad](https://downloads.gmllab.com/SPanC-Lnc/CM_pacbio.h5ad) - 26.1 MB
