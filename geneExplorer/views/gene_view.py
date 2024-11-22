@@ -7,7 +7,6 @@ import django.http.response as http_response
 import django.views as django_views
 import django.views.decorators.csrf as django_views_csrf
 import django.utils.decorators as django_decorators
-import rest_framework.generics as rest_framework_generics
 import matplotlib as matplotlib
 import matplotlib.pyplot as matplotlib_plt
 import scanpy as sc
@@ -81,7 +80,7 @@ class GeneView(django_views.View):
                         'plotImage': ge_views.NotFoundImage.not_found(),
                         'name': 'Feature not found in sample'
                     })
-                    response_data = {'message': 'success', 'data': plots}
+            response_data = {'message': 'success', 'data': plots}
             return http_response.JsonResponse(response_data, status=200)
         except json.JSONDecodeError as e:
             return http_response.JsonResponse({'error': 'Invalid JSON format'}, status=400)
