@@ -1,15 +1,14 @@
 import rest_framework.generics as rest_framework_generics
-import rest_framework.filters as rest_framework_filters
 import geneExplorer.models as ge_models
 import geneExplorer.serializer as ge_serializer
-
+from geneExplorer.filters.CustomGeneSearchFilter import CustomGeneSearchFilter
 
 class GenesListView(rest_framework_generics.ListAPIView):
     authentication_classes = ()
     permission_classes = ()
     queryset = ge_models.Genes.objects.all()
     serializer_class = ge_serializer.GenesListSerializer
-    filter_backends = [rest_framework_filters.SearchFilter]
+    filter_backends = [CustomGeneSearchFilter]
     search_fields = (
         'id', 'cutar_id', 'chromosome', 'start', 'end', 'transcript', 'strand', 'samples_detected',
         'cancer_types_detected', 'cell_type_specificity', 'cell_type_specificity_in_cancer_type',
@@ -40,5 +39,4 @@ class GenesListView(rest_framework_generics.ListAPIView):
             queryset = queryset.order_by(ordering_param)
         else:
             queryset = queryset.order_by(default_ordering)
-
         return queryset
