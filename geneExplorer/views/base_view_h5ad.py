@@ -1,5 +1,6 @@
 import base64 as base64
 import io as io
+import threading as threading
 import json as json
 
 import anndata as anndata
@@ -13,9 +14,12 @@ import scanpy as sc
 
 import geneExplorer.views as ge_views
 
+matplotlib.use('Agg')  # Set this at module level
+
 @django_decorators.method_decorator(django_views_csrf.csrf_exempt, name='dispatch')
 class BaseViewH5ad(django_views.View):
     h5ad_files = []
+    _plot_lock = threading.Lock()
 
     def get(self, request):
         gene_id = request.GET.get('cutarId', None)
@@ -36,7 +40,6 @@ class BaseViewH5ad(django_views.View):
             )
 
         try:
-            matplotlib.use('Agg')
             file_info = maybe_file_info[0]
             adata = anndata.read_h5ad(file_info["filePath"])
 
@@ -46,7 +49,7 @@ class BaseViewH5ad(django_views.View):
                     content_type='image/png'
                 )
 
-            buffer = self.generate_spatial_plot(adata, gene_id, file_info['size'], False)
+            buffer = self.generate_spatial_plot(adata, gene_id, file_info['spot_size'], False)
             return http_response.HttpResponse(
                 buffer.getvalue(),
                 content_type='image/png'
@@ -62,12 +65,11 @@ class BaseViewH5ad(django_views.View):
         try:
             data = json.loads(request.body)
             gene_id = data.get('cutarId', None)
-            matplotlib.use('Agg')
             plots = []
             for file_info in self.h5ad_files:
                 adata = anndata.read_h5ad(file_info["filePath"])
                 if gene_id in adata.var_names:
-                    buffer = self.generate_spatial_plot(adata, gene_id, file_info['size'], True)
+                    buffer = self.generate_spatial_plot(adata, gene_id, file_info['spot_size'], True)
                     plots.append({'plotImage': buffer, 'name': file_info['name']})
                 else:
                     plots.append({
@@ -79,31 +81,40 @@ class BaseViewH5ad(django_views.View):
         except json.JSONDecodeError as e:
             return http_response.JsonResponse({'error': 'Invalid JSON format'}, status=400)
 
-    def generate_spatial_plot(self, adata, gene_id, plot_size, return_base64=True):
-        try:
-            sc.pl.spatial(
-                adata,
-                alpha_img=0.5,
-                color=[gene_id],
-                show=False,
-                cmap='inferno',
-                size=plot_size
-            )
+    def generate_spatial_plot(self, adata, gene_id, spot_size, return_base64=True):
+        with self._plot_lock:  # Ensure thread-safe plotting
+            try:
+                matplotlib_plt.clf()
+                matplotlib_plt.close('all')
 
-            fig = matplotlib_plt.gcf()
-            buffer = io.BytesIO()
-            fig.savefig(buffer, format='png', bbox_inches='tight')
-            buffer.seek(0)
+                fig = matplotlib_plt.figure(figsize=(6.4, 6.4))
+                sc.pl.spatial(
+                    adata,
+                    alpha_img=0.5,
+                    color=[gene_id],
+                    show=False,
+                    cmap='inferno',
+                    size=spot_size,
+                    ax=fig.gca()
+                )
+                buffer = io.BytesIO()
+                buffer.seek(0)
+                fig.savefig(buffer, format='png', bbox_inches='tight')
 
-            if return_base64:
-                base64_image = base64.b64encode(buffer.read()).decode('utf-8')
-                buffer.close()
-                matplotlib_plt.close(fig)
-                return base64_image
-            else:
-                matplotlib_plt.close(fig)
-                return buffer
+                if return_base64:
+                    base64_image = base64.b64encode(buffer.getvalue()).decode('utf-8')
+                    buffer.close()
+                    matplotlib_plt.close(fig)
+                    return base64_image
+                else:
+                    content = buffer.getvalue()
+                    buffer.close()
+                    matplotlib_plt.close(fig)
 
-        except Exception as e:
-            matplotlib_plt.close()  # Ensure figure is closed even if there's an error
-            raise e
+                    new_buffer = io.BytesIO(content)
+                    new_buffer.seek(0)
+                    return new_buffer
+
+            except Exception as e:
+                matplotlib_plt.close()  # Ensure figure is closed even if there's an error
+                raise e
