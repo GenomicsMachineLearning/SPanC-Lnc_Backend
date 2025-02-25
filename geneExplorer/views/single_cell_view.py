@@ -102,7 +102,7 @@ class SingleCellView(django_views.View):
                 )
                 buffer = io.BytesIO()
                 buffer.seek(0)
-                fig.savefig(buffer, format='png', bbox_inches='tight')
+                fig.savefig(buffer, format='png', bbox_inches='tight', dpi=72)
 
                 if return_base64:
                     base64_image = base64.b64encode(buffer.getvalue()).decode('utf-8')
