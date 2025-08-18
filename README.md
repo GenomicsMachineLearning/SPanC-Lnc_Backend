@@ -45,6 +45,7 @@ We assume you already have conda installed.
 
 * Test server (make sure you have downloaded BCC_nano.h5ad and put into the ./data directory):
   * ```curl 'http://localhost:8000/genesSlr?cutarId=cuTAR86784&sampleName=BCC%20-%20Nanopore' --output output.png```
+  * ```curl 'http://localhost:8000/alphaGenome?search=chr1:72899%2B10000' --output output.png```
 
 ### Running the Server using Docker
 

@@ -5,14 +5,12 @@ from django import views as django_views
 import django.http.response as http_response
 from django.http import JsonResponse
 from Incrna import settings
-import alphagenome.data as alphagenome_data
+from ..genomic_utils import parse_genomic_coordinates
 import alphagenome.data.genome as alphagenome_data_genome
 import alphagenome.data.gene_annotation as alphagenome_data_gene_annotation
 import alphagenome.data.transcript as alphagenome_data_transcript
-import alphagenome.models as alphagenome_models
 import alphagenome.models.dna_client as alphagenome_dna_client
 import alphagenome.models.dna_output as alphagenome_dna_output
-import alphagenome.visualization as alphagenome_visualization
 import alphagenome.visualization.plot_components as alphagenome_visualization_plot_components
 import matplotlib as matplotlib
 import matplotlib.pyplot as matplotlib_plt
@@ -24,6 +22,7 @@ import django.views.decorators.csrf as django_views_csrf
 class AlphaGenomeView(django_views.View):
     # Class-level attributes
     ontology_terms = ['UBERON:0001155']  # COLON
+    organism = alphagenome_dna_client.Organism.HOMO_SAPIENS
     gtf_url = 'https://storage.googleapis.com/alphagenome/reference/gencode/hg38/gencode.v46.annotation.gtf.gz.feather'
     _analysis_lock = threading.Lock()
     _api_key = settings.ALPHA_GENOME_API_KEY
@@ -33,10 +32,12 @@ class AlphaGenomeView(django_views.View):
     _longest_transcript_extractor = None
 
     def get(self, request):
-        # Get parameters from request
-        chr = request.GET.get('chr', 'chr8')
-        start = int(request.GET.get('start', 21445867))
-        stop = int(request.GET.get('stop', 21447688))
+        search_param = request.GET.get('search', None)
+        chr_parsed, start_parsed, end_parsed = parse_genomic_coordinates(
+            str(search_param)) if search_param else (None, None, None)
+        chr = chr_parsed or 'chr8'
+        start = start_parsed or 21445867
+        stop = end_parsed or 21447688
 
         try:
             with self._analysis_lock:
@@ -63,6 +64,7 @@ class AlphaGenomeView(django_views.View):
         # Make predictions
         output = dna_model.predict_interval(
             interval=interval,
+            organism=self.organism,
             requested_outputs={
                 alphagenome_dna_output.OutputType.RNA_SEQ,
                 alphagenome_dna_output.OutputType.SPLICE_SITES,
@@ -125,7 +127,7 @@ class AlphaGenomeView(django_views.View):
 
     def _load_gtf_data(self):
         """Load and cache GTF data"""
-        self._gtf_data = pd.read_feather(self.gtf_url)
+        AlphaGenomeView._gtf_data = pd.read_feather(self.gtf_url)
 
         # Filter to protein-coding genes and highly supported transcripts
         gtf_transcript = alphagenome_data_gene_annotation.filter_transcript_support_level(
@@ -133,8 +135,8 @@ class AlphaGenomeView(django_views.View):
         )
 
         # Create extractors
-        self._transcript_extractor = alphagenome_data_transcript.TranscriptExtractor(gtf_transcript)
+        AlphaGenomeView._transcript_extractor = alphagenome_data_transcript.TranscriptExtractor(gtf_transcript)
         gtf_longest_transcript = alphagenome_data_gene_annotation.filter_to_longest_transcript(
             gtf_transcript)
-        self._longest_transcript_extractor = alphagenome_data_transcript.TranscriptExtractor(
+        AlphaGenomeView._longest_transcript_extractor = alphagenome_data_transcript.TranscriptExtractor(
             gtf_longest_transcript)
