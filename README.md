@@ -43,8 +43,8 @@ We assume you already have conda installed.
 * Run server:
   * ```python manage.py runserver```
 
-* Test server:
-  * ```curl```
+* Test server (make sure you have downloaded BCC_nano.h5ad and put into the ./data directory):
+  * ```curl 'http://localhost:8000/genesSlr?cutarId=cuTAR86784&sampleName=BCC%20-%20Nanopore' --output output.png```
 
 ### Running the Server using Docker
 

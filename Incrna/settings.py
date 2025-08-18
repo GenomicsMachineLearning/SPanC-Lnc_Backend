@@ -128,6 +128,9 @@ if os.environ.get('DJANGO_ENV') == 'production':
 else:
     DATA_DIR = './data'
 
+# Google AlphaGenome API Key (get from environment)
+ALPHA_GENOME_API_KEY = os.environ['ALPHA_GENOME_API_KEY']
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
