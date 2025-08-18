@@ -8,5 +8,6 @@ urlpatterns = [
     dj_urls.path('genes', views.GeneView.as_view(), name='GeneExplorerView'),
     dj_urls.path('genesSlr', views.GeneSpatialLongReadView.as_view(), name='GeneExplorerView'),
     dj_urls.path('genesScr', views.SingleCellView.as_view(), name='SingleCellView'),
+    dj_urls.path('alphaGenome', views.AlphaGenomeView.as_view(), name='AlphaGenomeView'),
 
 ]

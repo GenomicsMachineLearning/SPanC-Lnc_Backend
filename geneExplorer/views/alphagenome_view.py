@@ -1,15 +1,14 @@
 import pandas as pd
 import threading
 from django import views as django_views
-from django.views import decorators as django_decorators
-from django.views.decorators import csrf as django_views_csrf
 from django.http import JsonResponse
 from Incrna import settings
 import alphagenome.data as alphagenome_data
 import alphagenome.models as alphagenome_models
 import alphagenome.visualization as alphagenome_visualization
 import matplotlib.pyplot as plt
-import django.conf as django_conf
+import django.utils.decorators as django_decorators
+import django.views.decorators.csrf as django_views_csrf
 
 @django_decorators.method_decorator(django_views_csrf.csrf_exempt, name='dispatch')
 class AlphaGenomeView(django_views.View):
@@ -17,6 +16,7 @@ class AlphaGenomeView(django_views.View):
     ontology_terms = ['UBERON:0001155']  # COLON
     gtf_url = 'https://storage.googleapis.com/alphagenome/reference/gencode/hg38/gencode.v46.annotation.gtf.gz.feather'
     _analysis_lock = threading.Lock()
+    _api_key = settings.ALPHA_GENOME_API_KEY
     # Cache GTF data at class level to avoid reloading
     _gtf_data = None
     _transcript_extractor = None
@@ -29,8 +29,12 @@ class AlphaGenomeView(django_views.View):
         stop = int(request.GET.get('stop', 21447688))
 
         try:
-            with self._analysis_lock:
-                return self._do_alphagenome_analysis(chr, start, stop)
+            print(self._api_key)
+            # with self._analysis_lock:
+            #     return self._do_alphagenome_analysis(chr, start, stop)
+            return JsonResponse({
+                'success': True,
+            }, status=200)
 
         except Exception as e:
             return JsonResponse({
@@ -39,7 +43,7 @@ class AlphaGenomeView(django_views.View):
             }, status=500)
 
     def _do_alphagenome_analysis(self, chr, start, stop):
-        dna_model = alphagenome_models.create(settings.ALPHA_GENOME_API_KEY)
+        dna_model = alphagenome_models.create(self._api_key)
 
         # Initialize GTF data if not already loaded
         if self._gtf_data is None:

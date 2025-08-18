@@ -5,3 +5,4 @@ from .genes_list_view import GenesListView
 from .home_view import HomeView
 from .not_found_image import NotFoundImage
 from .single_cell_view import SingleCellView
+from .alphagenome_view import AlphaGenomeView
