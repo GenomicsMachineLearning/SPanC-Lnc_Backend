@@ -1,12 +1,22 @@
+import io as io
 import pandas as pd
 import threading
 from django import views as django_views
+import django.http.response as http_response
 from django.http import JsonResponse
 from Incrna import settings
 import alphagenome.data as alphagenome_data
+import alphagenome.data.genome as alphagenome_data_genome
+import alphagenome.data.gene_annotation as alphagenome_data_gene_annotation
+import alphagenome.data.transcript as alphagenome_data_transcript
 import alphagenome.models as alphagenome_models
+import alphagenome.models.dna_client as alphagenome_dna_client
+import alphagenome.models.dna_output as alphagenome_dna_output
 import alphagenome.visualization as alphagenome_visualization
-import matplotlib.pyplot as plt
+import alphagenome.visualization.plot_components as alphagenome_visualization_plot_components
+import matplotlib as matplotlib
+import matplotlib.pyplot as matplotlib_plt
+matplotlib.use('Agg')  # Use non-interactive backend
 import django.utils.decorators as django_decorators
 import django.views.decorators.csrf as django_views_csrf
 
@@ -29,12 +39,8 @@ class AlphaGenomeView(django_views.View):
         stop = int(request.GET.get('stop', 21447688))
 
         try:
-            print(self._api_key)
-            # with self._analysis_lock:
-            #     return self._do_alphagenome_analysis(chr, start, stop)
-            return JsonResponse({
-                'success': True,
-            }, status=200)
+            with self._analysis_lock:
+                return self._do_alphagenome_analysis(chr, start, stop)
 
         except Exception as e:
             return JsonResponse({
@@ -43,7 +49,7 @@ class AlphaGenomeView(django_views.View):
             }, status=500)
 
     def _do_alphagenome_analysis(self, chr, start, stop):
-        dna_model = alphagenome_models.create(self._api_key)
+        dna_model = alphagenome_dna_client.create(self._api_key)
 
         # Initialize GTF data if not already loaded
         if self._gtf_data is None:
@@ -52,16 +58,16 @@ class AlphaGenomeView(django_views.View):
         # Your AlphaGenome code
         new_start, new_stop, new_len = self._adjust_interval_with_extra_base(
             start, stop)
-        interval = alphagenome_data.Interval(chromosome=chr, start=new_start, end=new_stop)
+        interval = alphagenome_data_genome.Interval(chromosome=chr, start=new_start, end=new_stop)
 
         # Make predictions
         output = dna_model.predict_interval(
             interval=interval,
             requested_outputs={
-                alphagenome_models.OutputType.RNA_SEQ,
-                alphagenome_models.OutputType.SPLICE_SITES,
-                alphagenome_models.OutputType.SPLICE_SITE_USAGE,
-                alphagenome_models.OutputType.SPLICE_JUNCTIONS,
+                alphagenome_dna_output.OutputType.RNA_SEQ,
+                alphagenome_dna_output.OutputType.SPLICE_SITES,
+                alphagenome_dna_output.OutputType.SPLICE_SITE_USAGE,
+                alphagenome_dna_output.OutputType.SPLICE_JUNCTIONS,
             },
             ontology_terms=self.ontology_terms,
         )
@@ -69,10 +75,10 @@ class AlphaGenomeView(django_views.View):
         longest_transcripts = self._longest_transcript_extractor.extract(interval)
 
         # Build plot
-        plot = alphagenome_visualization.plot(
+        plot = alphagenome_visualization_plot_components.plot(
             [
-                alphagenome_visualization.TranscriptAnnotation(longest_transcripts),
-                alphagenome_visualization.Tracks(
+                alphagenome_visualization_plot_components.TranscriptAnnotation(longest_transcripts),
+                alphagenome_visualization_plot_components.Tracks(
                     tdata=output.splice_sites,
                     ylabel_template='SPLICE SITES: {name} ({strand})',
                 ),
@@ -80,15 +86,26 @@ class AlphaGenomeView(django_views.View):
             interval=interval,
             title='Predicted splicing effects for Colon tissue',
         )
+        return self._plot_to_png_response(plot, chr, new_start, new_stop)
 
-        return JsonResponse({
-            'success': True,
-            'interval': f"{chr}:{new_start}-{new_stop}",
-            'splice_sites_count': len(output.splice_sites.data) if hasattr(
-                output.splice_sites, 'data') else 0,
-            'transcripts_count': len(longest_transcripts),
-            # Add other data you need
-        })
+    @staticmethod
+    def _plot_to_png_response(plot, chr, start, stop):
+        """Convert the plot to PNG and return as HTTP response"""
+        # Create a BytesIO buffer
+        buffer = io.BytesIO()
+
+        # Save the plot to the buffer as PNG
+        plot.savefig(buffer, format='png', dpi=300, bbox_inches='tight')
+        buffer.seek(0)
+
+        response = http_response.HttpResponse(buffer.getvalue(), content_type='image/png')
+        response[
+            'Content-Disposition'] = f'inline; filename="alphagenome_{chr}_{start}_{stop}.png"'
+
+        # Close the plot to free memory
+        matplotlib_plt.close(plot)
+
+        return response
 
     @staticmethod
     def _adjust_interval_with_extra_base(start: int, stop: int):
@@ -111,13 +128,13 @@ class AlphaGenomeView(django_views.View):
         self._gtf_data = pd.read_feather(self.gtf_url)
 
         # Filter to protein-coding genes and highly supported transcripts
-        gtf_transcript = alphagenome_data.filter_transcript_support_level(
-            alphagenome_data.filter_protein_coding(self._gtf_data), ['1']
+        gtf_transcript = alphagenome_data_gene_annotation.filter_transcript_support_level(
+            alphagenome_data_gene_annotation.filter_protein_coding(self._gtf_data), ['1']
         )
 
         # Create extractors
-        self._transcript_extractor = alphagenome_data.transcript.TranscriptExtractor(gtf_transcript)
-        gtf_longest_transcript = alphagenome_data.gene_annotation.filter_to_longest_transcript(
+        self._transcript_extractor = alphagenome_data_transcript.TranscriptExtractor(gtf_transcript)
+        gtf_longest_transcript = alphagenome_data_gene_annotation.filter_to_longest_transcript(
             gtf_transcript)
-        self._longest_transcript_extractor = alphagenome_data.transcript.TranscriptExtractor(
+        self._longest_transcript_extractor = alphagenome_data_transcript.TranscriptExtractor(
             gtf_longest_transcript)
