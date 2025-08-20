@@ -5,6 +5,7 @@ from django import views as django_views
 import django.http.response as http_response
 from django.http import JsonResponse
 from Incrna import settings
+import matplotlib.pyplot as matplotlib_plt
 from ..genomic_utils import parse_genomic_coordinates
 import alphagenome.data.genome as alphagenome_data_genome
 import alphagenome.data.gene_annotation as alphagenome_data_gene_annotation
@@ -81,20 +82,7 @@ class AlphaGenomeView(django_views.View):
         )
 
         longest_transcripts = longest_transcript_extractor.extract(interval)
-
-        # Build plot
-        plot = alphagenome_visualization_plot_components.plot(
-            [
-                alphagenome_visualization_plot_components.TranscriptAnnotation(longest_transcripts),
-                alphagenome_visualization_plot_components.Tracks(
-                    tdata=output.splice_sites,
-                    ylabel_template='SPLICE SITES: {name} ({strand})',
-                ),
-            ],
-            interval=interval,
-            title='Predicted splicing effects for Colon tissue',
-        )
-        return self._plot_to_png_response(plot, chr, new_start, new_stop)
+        return self._plot_to_png_response(interval, output, longest_transcripts)
 
     def download_gtf_if_needed(self):
         local_path = self.gtf_local_path
@@ -121,16 +109,35 @@ class AlphaGenomeView(django_views.View):
         return longest_transcript_extractor
 
     @staticmethod
-    def _plot_to_png_response(plot, chr, start, stop):
+    def _plot_to_png_response(interval, output, longest_transcripts):
+        matplotlib_plt.clf()
+        matplotlib_plt.close('all')
+
+        fig = alphagenome_visualization_plot_components.plot(
+            [
+                alphagenome_visualization_plot_components.TranscriptAnnotation(longest_transcripts),
+                alphagenome_visualization_plot_components.Tracks(
+                    tdata=output.splice_sites,
+                    ylabel_template='SPLICE SITES: {name} ({strand})',
+                ),
+            ],
+            interval=interval,
+            title='Predicted splicing effects for Colon tissue',
+        )
+
         buffer = io.BytesIO()
-
-        # Save the plot to the buffer as PNG
-        plot.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
         buffer.seek(0)
+        fig.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
 
-        response = http_response.HttpResponse(buffer.getvalue(), content_type='image/png')
+        content = buffer.getvalue()
+        buffer.close()
+        matplotlib_plt.close(fig)
+        new_buffer = io.BytesIO(content)
+        new_buffer.seek(0)
 
-        matplotlib_plt.close(plot)
+        response = http_response.HttpResponse(new_buffer.getvalue(), content_type='image/png')
+
+        matplotlib_plt.close(fig)
 
         return response
 
