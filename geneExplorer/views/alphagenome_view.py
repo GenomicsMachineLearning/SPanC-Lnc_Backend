@@ -95,7 +95,7 @@ class AlphaGenomeView(django_views.View):
         buffer = io.BytesIO()
 
         # Save the plot to the buffer as PNG
-        plot.savefig(buffer, format='png', dpi=300, bbox_inches='tight')
+        plot.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
         buffer.seek(0)
 
         response = http_response.HttpResponse(buffer.getvalue(), content_type='image/png')
