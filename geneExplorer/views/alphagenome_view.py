@@ -129,8 +129,6 @@ class AlphaGenomeView(django_views.View):
         buffer.seek(0)
 
         response = http_response.HttpResponse(buffer.getvalue(), content_type='image/png')
-        response['Content-Disposition'] = \
-            f'inline; filename="alphagenome_{chr}_{start}_{stop}.png"'
 
         matplotlib_plt.close(plot)
 
