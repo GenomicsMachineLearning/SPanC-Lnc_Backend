@@ -92,8 +92,6 @@ class AlphaGenomeView(django_views.View):
 
     @staticmethod
     def _plot_to_png_response(plot, chr, start, stop):
-        """Convert the plot to PNG and return as HTTP response"""
-        # Create a BytesIO buffer
         buffer = io.BytesIO()
 
         # Save the plot to the buffer as PNG
@@ -101,10 +99,9 @@ class AlphaGenomeView(django_views.View):
         buffer.seek(0)
 
         response = http_response.HttpResponse(buffer.getvalue(), content_type='image/png')
-        response[
-            'Content-Disposition'] = f'inline; filename="alphagenome_{chr}_{start}_{stop}.png"'
+        response['Content-Disposition'] = \
+            f'inline; filename="alphagenome_{chr}_{start}_{stop}.png"'
 
-        # Close the plot to free memory
         matplotlib_plt.close(plot)
 
         return response
