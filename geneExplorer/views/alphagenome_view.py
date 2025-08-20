@@ -1,26 +1,29 @@
 import io as io
-import pandas as pd
+import pathlib as pathlib
 import threading
-from django import views as django_views
-import django.http.response as http_response
-from django.http import JsonResponse
-from Incrna import settings
-import matplotlib.pyplot as matplotlib_plt
-from ..genomic_utils import parse_genomic_coordinates
-import alphagenome.data.genome as alphagenome_data_genome
+import urllib as urllib
+
 import alphagenome.data.gene_annotation as alphagenome_data_gene_annotation
+import alphagenome.data.genome as alphagenome_data_genome
 import alphagenome.data.transcript as alphagenome_data_transcript
 import alphagenome.models.dna_client as alphagenome_dna_client
 import alphagenome.models.dna_output as alphagenome_dna_output
-import alphagenome.visualization.plot_components as alphagenome_visualization_plot_components
-import matplotlib as matplotlib
-import matplotlib.pyplot as matplotlib_plt
-matplotlib.use('Agg')  # Use non-interactive backend
+import \
+    alphagenome.visualization.plot_components as alphagenome_visualization_plot_components
+import django.http.response as http_response
 import django.utils.decorators as django_decorators
 import django.views.decorators.csrf as django_views_csrf
-import pathlib as pathlib
-import os as os
-import urllib as urllib
+import matplotlib as matplotlib
+import matplotlib.pyplot as matplotlib_plt
+import pandas as pd
+from django import views as django_views
+from django.http import JsonResponse
+
+from Incrna import settings
+from ..genomic_utils import parse_genomic_coordinates
+
+matplotlib.use('Agg')  # Use non-interactive backend
+
 
 @django_decorators.method_decorator(django_views_csrf.csrf_exempt, name='dispatch')
 class AlphaGenomeView(django_views.View):
@@ -66,7 +69,8 @@ class AlphaGenomeView(django_views.View):
         # Your AlphaGenome code
         new_start, new_stop, new_len = self._adjust_interval_with_extra_base(
             start, stop)
-        interval = alphagenome_data_genome.Interval(chromosome=chr, start=new_start, end=new_stop)
+        interval = alphagenome_data_genome.Interval(chromosome=chr, start=new_start,
+                                                    end=new_stop)
 
         # Make predictions
         output = dna_model.predict_interval(
@@ -115,7 +119,8 @@ class AlphaGenomeView(django_views.View):
 
         fig = alphagenome_visualization_plot_components.plot(
             [
-                alphagenome_visualization_plot_components.TranscriptAnnotation(longest_transcripts),
+                alphagenome_visualization_plot_components.TranscriptAnnotation(
+                    longest_transcripts),
                 alphagenome_visualization_plot_components.Tracks(
                     tdata=output.splice_sites,
                     ylabel_template='SPLICE SITES: {name} ({strand})',
@@ -126,19 +131,12 @@ class AlphaGenomeView(django_views.View):
         )
 
         buffer = io.BytesIO()
-        buffer.seek(0)
         fig.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
-
         content = buffer.getvalue()
         buffer.close()
         matplotlib_plt.close(fig)
-        new_buffer = io.BytesIO(content)
-        new_buffer.seek(0)
 
-        response = http_response.HttpResponse(new_buffer.getvalue(), content_type='image/png')
-
-        matplotlib_plt.close(fig)
-
+        response = http_response.HttpResponse(content, content_type='image/png')
         return response
 
     @staticmethod

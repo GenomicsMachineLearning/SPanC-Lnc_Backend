@@ -98,7 +98,6 @@ class BaseViewH5ad(django_views.View):
                     ax=fig.gca()
                 )
                 buffer = io.BytesIO()
-                buffer.seek(0)
                 fig.savefig(buffer, format='png', bbox_inches='tight')
 
                 if return_base64:
@@ -110,10 +109,7 @@ class BaseViewH5ad(django_views.View):
                     content = buffer.getvalue()
                     buffer.close()
                     matplotlib_plt.close(fig)
-
-                    new_buffer = io.BytesIO(content)
-                    new_buffer.seek(0)
-                    return new_buffer
+                    return content
 
             except Exception as e:
                 matplotlib_plt.close()  # Ensure figure is closed even if there's an error
