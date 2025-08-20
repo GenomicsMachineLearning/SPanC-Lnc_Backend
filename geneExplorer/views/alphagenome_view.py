@@ -17,19 +17,24 @@ import matplotlib.pyplot as matplotlib_plt
 matplotlib.use('Agg')  # Use non-interactive backend
 import django.utils.decorators as django_decorators
 import django.views.decorators.csrf as django_views_csrf
+import pathlib as pathlib
+import os as os
+import urllib as urllib
 
 @django_decorators.method_decorator(django_views_csrf.csrf_exempt, name='dispatch')
 class AlphaGenomeView(django_views.View):
     # Class-level attributes
     ontology_terms = ['UBERON:0001155']  # COLON
     organism = alphagenome_dna_client.Organism.HOMO_SAPIENS
-    gtf_url = 'https://storage.googleapis.com/alphagenome/reference/gencode/hg38/gencode.v46.annotation.gtf.gz.feather'
+    gtf_filename = 'gencode.v46.annotation.gtf.gz.feather'
+    gtf_url = f'https://storage.googleapis.com/alphagenome/reference/gencode/hg38/{gtf_filename}'
     _analysis_lock = threading.Lock()
     _api_key = settings.ALPHA_GENOME_API_KEY
-    # Cache GTF data at class level to avoid reloading
-    _gtf_data = None
-    _transcript_extractor = None
-    _longest_transcript_extractor = None
+
+    @property
+    def gtf_local_path(self):
+        data_dir = settings.DATA_DIR
+        return pathlib.Path(data_dir) / self.gtf_filename
 
     def get(self, request):
         search_param = request.GET.get('search', None)
@@ -52,9 +57,10 @@ class AlphaGenomeView(django_views.View):
     def _do_alphagenome_analysis(self, chr, start, stop):
         dna_model = alphagenome_dna_client.create(self._api_key)
 
-        # Initialize GTF data if not already loaded
-        if self._gtf_data is None:
-            self._load_gtf_data()
+        # Ensure GTF data is loaded
+        self.download_gtf_if_needed()
+        gtf_data = pd.read_feather(self.gtf_local_path)
+        longest_transcript_extractor = self._load_gtf_data(gtf_data)
 
         # Your AlphaGenome code
         new_start, new_stop, new_len = self._adjust_interval_with_extra_base(
@@ -74,7 +80,7 @@ class AlphaGenomeView(django_views.View):
             ontology_terms=self.ontology_terms,
         )
 
-        longest_transcripts = self._longest_transcript_extractor.extract(interval)
+        longest_transcripts = longest_transcript_extractor.extract(interval)
 
         # Build plot
         plot = alphagenome_visualization_plot_components.plot(
@@ -89,6 +95,30 @@ class AlphaGenomeView(django_views.View):
             title='Predicted splicing effects for Colon tissue',
         )
         return self._plot_to_png_response(plot, chr, new_start, new_stop)
+
+    def download_gtf_if_needed(self):
+        local_path = self.gtf_local_path
+        if local_path.exists():
+            print(f"GTF file already exists at {local_path}")
+            return
+        local_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            urllib.request.urlretrieve(self.gtf_url, local_path)
+        except Exception as e:
+            raise Exception(f"Failed to download GTF file: {str(e)}")
+
+    @staticmethod
+    def _load_gtf_data(gtf_data):
+        # Filter to protein-coding genes and highly supported transcripts
+        gtf_transcript = alphagenome_data_gene_annotation.filter_transcript_support_level(
+            alphagenome_data_gene_annotation.filter_protein_coding(gtf_data), ['1']
+        )
+        # Create extractors
+        gtf_longest_transcript = alphagenome_data_gene_annotation.filter_to_longest_transcript(
+            gtf_transcript)
+        longest_transcript_extractor = alphagenome_data_transcript.TranscriptExtractor(
+            gtf_longest_transcript)
+        return longest_transcript_extractor
 
     @staticmethod
     def _plot_to_png_response(plot, chr, start, stop):
@@ -121,19 +151,3 @@ class AlphaGenomeView(django_views.View):
         # Double check length
         final_length = new_stop - start + 1
         return start, new_stop, final_length
-
-    def _load_gtf_data(self):
-        """Load and cache GTF data"""
-        AlphaGenomeView._gtf_data = pd.read_feather(self.gtf_url)
-
-        # Filter to protein-coding genes and highly supported transcripts
-        gtf_transcript = alphagenome_data_gene_annotation.filter_transcript_support_level(
-            alphagenome_data_gene_annotation.filter_protein_coding(self._gtf_data), ['1']
-        )
-
-        # Create extractors
-        AlphaGenomeView._transcript_extractor = alphagenome_data_transcript.TranscriptExtractor(gtf_transcript)
-        gtf_longest_transcript = alphagenome_data_gene_annotation.filter_to_longest_transcript(
-            gtf_transcript)
-        AlphaGenomeView._longest_transcript_extractor = alphagenome_data_transcript.TranscriptExtractor(
-            gtf_longest_transcript)
