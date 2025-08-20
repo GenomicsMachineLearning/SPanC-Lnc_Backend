@@ -129,7 +129,7 @@ else:
     DATA_DIR = './data'
 
 # Google AlphaGenome API Key (get from environment)
-ALPHA_GENOME_API_KEY = os.environ['ALPHA_GENOME_API_KEY']
+ALPHA_GENOME_API_KEY = os.environ.get('ALPHA_GENOME_API_KEY', 'unknown')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
