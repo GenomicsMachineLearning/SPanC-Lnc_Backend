@@ -109,7 +109,8 @@ class BaseViewH5ad(django_views.View):
                     content = buffer.getvalue()
                     buffer.close()
                     matplotlib_plt.close(fig)
-                    return content
+                    new_buffer = io.BytesIO(content)
+                    return new_buffer
 
             except Exception as e:
                 matplotlib_plt.close()  # Ensure figure is closed even if there's an error

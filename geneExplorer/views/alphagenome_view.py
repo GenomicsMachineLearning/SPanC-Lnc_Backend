@@ -114,30 +114,34 @@ class AlphaGenomeView(django_views.View):
 
     @staticmethod
     def _plot_to_png_response(interval, output, longest_transcripts):
-        matplotlib_plt.clf()
-        matplotlib_plt.close('all')
+        try:
+            matplotlib_plt.clf()
+            matplotlib_plt.close('all')
 
-        fig = alphagenome_visualization_plot_components.plot(
-            [
-                alphagenome_visualization_plot_components.TranscriptAnnotation(
-                    longest_transcripts),
-                alphagenome_visualization_plot_components.Tracks(
-                    tdata=output.splice_sites,
-                    ylabel_template='SPLICE SITES: {name} ({strand})',
-                ),
-            ],
-            interval=interval,
-            title='Predicted splicing effects for Colon tissue',
-        )
+            fig = alphagenome_visualization_plot_components.plot(
+                [
+                    alphagenome_visualization_plot_components.TranscriptAnnotation(
+                        longest_transcripts),
+                    alphagenome_visualization_plot_components.Tracks(
+                        tdata=output.splice_sites,
+                        ylabel_template='SPLICE SITES: {name} ({strand})',
+                    ),
+                ],
+                interval=interval,
+                title='Predicted splicing effects for Colon tissue',
+            )
 
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
-        content = buffer.getvalue()
-        buffer.close()
-        matplotlib_plt.close(fig)
-
-        response = http_response.HttpResponse(content, content_type='image/png')
-        return response
+            buffer = io.BytesIO()
+            fig.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
+            content = buffer.getvalue()
+            buffer.close()
+            matplotlib_plt.close(fig)
+            new_buffer = io.BytesIO(content)
+            response = http_response.HttpResponse(new_buffer, content_type='image/png')
+            return response
+        except Exception as e:
+            matplotlib_plt.close()  # Ensure figure is closed even if there's an error
+            raise e
 
     @staticmethod
     def _adjust_interval_with_extra_base(start: int, stop: int):
